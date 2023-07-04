@@ -1,19 +1,20 @@
-import "reflect-metadata"
-import { DataSource } from "typeorm"
-import { User } from "./entity/User"
+import "reflect-metadata";
+import { DataSource } from "typeorm";
+import { User } from "./models/User";
+import environmentConfig from "./constants/environment.constant";
 
 export const AppDataSource = new DataSource({
-    type: "mssql",
-    host: "PCI114\\SQL2017",
-    username: "sa",
-    password: "tatva123",
-    database: "light",
-    synchronize: true,
-    logging: false,
-    entities: [User],
-    migrations: [],
-    subscribers: [],
-    extra: {
-        trustServerCertificate: true,
-    }
-})
+  type: "mssql",
+  host: environmentConfig.HOST,
+  username: environmentConfig.USERNAME,
+  password: environmentConfig.PASSWORD,
+  database: environmentConfig.DATABASE,
+  synchronize: false,
+  logging: false,
+  entities: [User],
+  migrations: [],
+  subscribers: [],
+  extra: {
+    trustServerCertificate: true,
+  },
+});
