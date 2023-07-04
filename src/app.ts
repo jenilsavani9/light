@@ -1,11 +1,12 @@
 import express, { Express, Request, Response, Application } from "express";
 import * as dotenv from "dotenv";
-import { AppDataSource } from "./data-source";
-import { Routes } from "./routes";
+import { AppDataSource } from "./dbConfig";
+import environmentConfig from "./constants/environment.constant";
+import router from "./routes";
 
 dotenv.config();
 export class App {
-  private app: Express = express();
+  private app: Application = express();
 
   constructor() {
     this.app.use(express.json());
@@ -16,10 +17,10 @@ export class App {
       response.header("Access-Control-Allow-Methods", "*");
       next();
     });
+    this.app.use(router);
   }
 
   public async listen() {
-
     /**
      * database connection
      */
@@ -30,33 +31,33 @@ export class App {
     /**
      * Routes
      */
-    Routes.forEach((route) => {
-      (this.app as any)[route.method](
-        route.route,
-        (req: Request, res: Response, next: Function) => {
-          const result = new (route.controller as any)()[route.action](
-            req,
-            res,
-            next
-          );
-          if (result instanceof Promise) {
-            result.then((result) =>
-              result !== null && result !== undefined
-                ? res.send(result)
-                : undefined
-            );
-          } else if (result !== null && result !== undefined) {
-            res.json(result);
-          }
-        }
-      );
-    });
+    // Routes.forEach((route) => {
+    //   (this.app as any)[route.method](
+    //     route.route,
+    //     (req: Request, res: Response, next: Function) => {
+    //       const result = new (route.controller as any)()[route.action](
+    //         req,
+    //         res,
+    //         next
+    //       );
+    //       if (result instanceof Promise) {
+    //         result.then((result) =>
+    //           result !== null && result !== undefined
+    //             ? res.send(result)
+    //             : undefined
+    //         );
+    //       } else if (result !== null && result !== undefined) {
+    //         res.json(result);
+    //       }
+    //     }
+    //   );
+    // });
 
     /**
      * application running on port 3001
      */
-    await this.app.listen(3001, () => {
-      console.log(`Server running on ${3001}`);
+    await this.app.listen(environmentConfig.PORT, () => {
+      console.log(`Server running on ${environmentConfig.PORT}`);
     });
     return this.app;
   }
