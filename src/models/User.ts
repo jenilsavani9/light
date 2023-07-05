@@ -1,39 +1,48 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Generic } from "./Generic";
 
-enum Status {
-  active = 0,
-  deactive = 1,
-  pending = 2,
+export enum Status {
+  active,
+  deactive,
+  pending,
 }
 
-enum Roles {
-  admin = 0,
-  customer = 1,
+export enum Roles {
+  admin,
+  customer,
 }
 
-@Entity()
-export class User {
+@Entity({ name: "Users" })
+export class User extends Generic {
   @PrimaryGeneratedColumn()
-  id!: number;
+  Id: number;
 
   @Column({ length: 20 })
-  firstName!: string;
+  FirstName: string;
 
   @Column({ length: 20 })
-  lastName!: string;
+  LastName: string;
 
   @Column({ length: 50 })
-  email!: string;
+  Email: string;
 
   @Column()
-  password!: string;
+  Password: string;
 
-  @Column({ type: "enum", enum: Status, default: Status.pending })
-  status!: number;
+  @Column({
+    type: "int",
+    enum: Status,
+    default: Status.pending,
+  })
+  Status: Status;
 
-  @Column({ type: "enum", enum: Roles, default: Roles.customer })
-  role!: number;
+  @Column({
+    type: "int",
+    enum: Roles,
+    default: Roles.customer,
+  })
+  Role: Roles;
 
   @Column({ nullable: true })
-  lastLogin?: string;
+  LastLogin: string | null;
 }

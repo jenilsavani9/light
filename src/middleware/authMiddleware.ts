@@ -3,13 +3,14 @@ import environmentConfig from "../constants/environment.constant";
 import jwt = require("jsonwebtoken");
 import { AuthFailureError } from "../utils/error.handler";
 import { User } from "../models/User";
+import { UserService } from "../service/user";
 
 export const verifyToken = () => {
   return "Token verified";
 };
 
 export const verifyUser = async (
-  req,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
@@ -24,35 +25,37 @@ export const verifyUser = async (
   }
   const token = authorization.split(" ")[1];
   console.log("Token:", token);
-  // jwt.verify(
-  //   token,
-  //   "hellothisismyjwt",
-  //   async (err: any, payload: any) => {
-  //     if (err) {
-  //       throw new AuthFailureError("401", "Inavalid username or password..!");
-  //     }
-  //     const { id } = payload;
-  //     const user = await User.findOne({ where: { id } });
-  //     if (user) {
-  //       req.user = user;
-  //       next();
-  //     } else {
-  //       throw new AuthFailureError("401", "User not found..!");
-  //     }
-  //   }
-  // );
+  jwt.verify(
+    token,
+    environmentConfig.JWT_SECRET_KEY,
+    async (err: any, payload: any) => {
+      if (err) {
+        throw new AuthFailureError("401", "Inavalid username or password..!");
+      }
+      const { userId, role } = payload;
+      const user = await UserService.GetUserById(userId);
+      if (user) {
+        req.user = user;
+        next();
+      } else {
+        return res
+          .status(401)
+          .json({ message: "User Not found!", status: 400 });
+      }
+    }
+  );
 };
 
 export const verifyAdmin = async (
-  req,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  if (req.user?.role == "admin") {
+  if (req.user?.Role == 0) {
     next();
   } else {
     return res
-      .status(400)
+      .status(403)
       .json({ message: "You have no permission..!", status: 400 });
   }
 };
