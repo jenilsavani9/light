@@ -2,19 +2,19 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from './User';
 import { Generic } from './Generic';
 
-@Entity()
+@Entity({ name: "Tokens" })
 export class Token extends Generic {
   @PrimaryGeneratedColumn()
-  id: number;
+  Id: number;
 
   @Column()
-  userId: number;
+  UserId: number;
 
   @Column()
-  value: string;
+  Value: string;
 
   @Column()
-  isActive: boolean;
+  IsActive: boolean;
 
   @ManyToOne(() => User)
   user: User;

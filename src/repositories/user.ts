@@ -1,19 +1,24 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { UserService } from "../service/user";
+import { SuccessResponse } from "../utils/successResponse.handler";
 
 export class UserRepository {
-
-  public static async userLogin(req: Request, res: Response, next: NextFunction) {
+  public static async userLogin(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       return UserService.GenerateToken(req, res);
     } catch (err) {
+      console.log(err);
       return err;
     }
   }
 
   public static async Validate(req: Request, res: Response) {
     try {
-      return res.status(200).json("Validate");
+      return UserService.ValidateEmail(req, res);
     } catch (err) {
       return err;
     }
@@ -21,7 +26,16 @@ export class UserRepository {
 
   public static async ResetPassword(req: Request, res: Response) {
     try {
-      return res.status(200).json("ResetPassword");
+      let result = await UserService.ForgotPassword(req.body.UserId);
+      if (result == true) {
+        res
+          .status(200)
+          .json(new SuccessResponse(true, "", 200, "Password Reset"));
+      } else {
+        res
+          .status(400)
+          .json(new SuccessResponse(true, "", 400, "Password Reset"));
+      }
     } catch (err) {
       return err;
     }
@@ -29,7 +43,16 @@ export class UserRepository {
 
   public static async ForgotPassword(req: Request, res: Response) {
     try {
-      return res.status(200).json("ForgotPassword");
+      let result = await UserService.ForgotPassword(req.body.UserId);
+      if (result == true) {
+        res
+          .status(200)
+          .json(new SuccessResponse(true, "", 200, "Password Reset"));
+      } else {
+        res
+          .status(400)
+          .json(new SuccessResponse(true, "", 400, "Password Reset"));
+      }
     } catch (err) {
       return err;
     }

@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import environmentConfig from "../constants/environment.constant";
 import jwt = require("jsonwebtoken");
+
+import environmentConfig from "../constants/environment.constant";
 import { AuthFailureError } from "../utils/error.handler";
-import { User } from "../models/User";
 import { UserService } from "../service/user";
 
 export const verifyToken = () => {
@@ -32,7 +32,7 @@ export const verifyUser = async (
       if (err) {
         throw new AuthFailureError("401", "Inavalid username or password..!");
       }
-      const { userId, role } = payload;
+      const { userId } = payload;
       const user = await UserService.GetUserById(userId);
       if (user) {
         req.user = user;
