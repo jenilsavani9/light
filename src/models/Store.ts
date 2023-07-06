@@ -4,7 +4,7 @@ import { Address } from './Address';
 import { StoreFeature } from './StoreFeature';
 import { Generic } from './Generic';
 
-@Entity()
+@Entity({ name: "Stores" })
 export class Store extends Generic {
   @PrimaryGeneratedColumn()
   id: number;

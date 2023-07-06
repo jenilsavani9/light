@@ -2,23 +2,20 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from './User';
 import { Generic } from './Generic';
 
-@Entity()
+@Entity({ name: "Features" })
 export class Feature extends Generic {
   @PrimaryGeneratedColumn()
-  id: number;
+  Id: number;
 
   @Column()
-  userId: number;
+  UserId: number;
 
   @Column({ length: 50 })
-  name: string;
+  Name: string;
 
   @Column({ length: 255, nullable: true })
-  description: string;
+  Description: string;
 
   @Column()
-  isActive: boolean;
-
-  @ManyToOne(() => User)
-  user: User;
+  IsActive: boolean;
 }

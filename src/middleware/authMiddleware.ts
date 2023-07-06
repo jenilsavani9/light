@@ -24,7 +24,6 @@ export const verifyUser = async (
     throw new AuthFailureError("401", "Invalid Token..!");
   }
   const token = authorization.split(" ")[1];
-  console.log("Token:", token);
   jwt.verify(
     token,
     environmentConfig.JWT_SECRET_KEY,

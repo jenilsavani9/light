@@ -4,7 +4,7 @@ import { Country } from './Country';
 import { State } from './State';
 import { Generic } from './Generic';
 
-@Entity()
+@Entity({ name: "Addresses" })
 export class Address extends Generic {
   @PrimaryGeneratedColumn()
   id: number;

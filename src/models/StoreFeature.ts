@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Feature } from './Feature';
 import { Store } from './Store';
 
-@Entity()
+@Entity({ name: "StoreFeatures" })
 export class StoreFeature {
   @PrimaryGeneratedColumn()
   id: number;

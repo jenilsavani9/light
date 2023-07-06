@@ -30,7 +30,7 @@ export class UserRepository {
       if (result == true) {
         res
           .status(200)
-          .json(new SuccessResponse(true, "", 200, "Request Success"));
+          .json(new SuccessResponse(true, "Request Success", 200, ""));
       } else {
         res
           .status(400)

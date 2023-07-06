@@ -135,7 +135,17 @@ export class UserService {
       await this.tokenRepository.save(Entry);
       await this.userRepository.save(user);
 
-      return res.status(200).json(new SuccessResponse(true, "", 200, user));
+      const resUser: ResponseUserDTO = {
+        id: user.Id,
+        firstName: user.FirstName,
+        lastName: user.LastName,
+        email: user.Email,
+        status: Status[user.Status],
+        role: Roles[user.Role],
+        lastLogin: user.LastLogin,
+      };
+
+      return res.status(200).json(new SuccessResponse(true, "Email Verified Successfully!", 200, resUser));
     } catch (error) {
       console.log(error);
       return error;
@@ -240,9 +250,9 @@ export class UserService {
 
   public static async ResetPassword(req) {
     try {
-      let email = req.body.email;
-      let password = req.body.password;
-      let newPassword = req.body.newPassword;
+      let email = req.body.Email;
+      let password = req.body.Password;
+      let newPassword = req.body.NewPassword;
       var tempUser = await this.userRepository.findOne({
         where: {
           Email: email,
