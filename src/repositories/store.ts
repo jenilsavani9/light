@@ -22,7 +22,16 @@ export class StoreRepository {
 
   public static async AddStore(req: Request, res: Response) {
     try {
-      return res.status(200).json("AddStore");
+      var result = await StoreService.AddStore(req);
+      if (result != null) {
+        res
+          .status(200)
+          .json(new SuccessResponse(true, "Request Success", 200, result));
+      } else {
+        res
+          .status(400)
+          .json(new SuccessResponse(true, "", 400, "Some Error Occurred"));
+      }
     } catch (err) {
       return err;
     }
@@ -30,7 +39,16 @@ export class StoreRepository {
 
   public static async GetStoreById(req: Request, res: Response) {
     try {
-      return res.status(200).json("GetStoreById");
+      var result = await StoreService.GetStoreByStoreId(req.params.id);
+      if (result != null) {
+        res
+          .status(200)
+          .json(new SuccessResponse(true, "Request Success", 200, result));
+      } else {
+        res
+          .status(400)
+          .json(new SuccessResponse(true, "", 400, "Some Error Occurred"));
+      }
     } catch (err) {
       return err;
     }
@@ -46,7 +64,16 @@ export class StoreRepository {
 
   public static async DeleteStore(req: Request, res: Response) {
     try {
-      return res.status(200).json("DeleteStore");
+      var result = await StoreService.DeleteStore(req);
+      if (result != null) {
+        res
+          .status(200)
+          .json(new SuccessResponse(true, "Request Success", 200, result));
+      } else {
+        res
+          .status(400)
+          .json(new SuccessResponse(true, "", 400, "Some Error Occurred"));
+      }
     } catch (err) {
       return err;
     }
