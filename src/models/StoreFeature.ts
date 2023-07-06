@@ -5,20 +5,15 @@ import { Store } from './Store';
 @Entity({ name: "StoreFeatures" })
 export class StoreFeature {
   @PrimaryGeneratedColumn()
-  id: number;
+  Id: number;
 
   @Column()
-  featureId: number;
+  FeatureId: number;
 
   @Column()
-  storeId: number;
+  StoreId: number;
 
   @Column()
-  status: boolean;
+  Status: boolean;
 
-  @ManyToOne(() => Feature)
-  feature: Feature;
-
-  @ManyToOne(() => Store)
-  store: Store;
 }

@@ -1,9 +1,20 @@
 import { Router, Request, Response, NextFunction } from "express";
+import { StoreService } from "../service/store";
+import { SuccessResponse } from "../utils/successResponse.handler";
 
 export class StoreRepository {
   public static async GetStoresByUserId(req: Request, res: Response) {
     try {
-      return res.status(200).json("GetStoresByUserId");
+      var result = await StoreService.GetStoresByUserId(req);
+      if (result != null) {
+        res
+          .status(200)
+          .json(new SuccessResponse(true, "Request Success", 200, result));
+      } else {
+        res
+          .status(400)
+          .json(new SuccessResponse(true, "", 400, "Some Error Occurred"));
+      }
     } catch (err) {
       return err;
     }
@@ -43,7 +54,8 @@ export class StoreRepository {
 
   public static async Location(req: Request, res: Response) {
     try {
-      return res.status(200).json("Location");
+      var locations = await StoreService.Location();
+      res.status(200).json(locations);
     } catch (err) {
       return err;
     }

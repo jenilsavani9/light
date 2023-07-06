@@ -7,35 +7,27 @@ import { Generic } from './Generic';
 @Entity({ name: "Addresses" })
 export class Address extends Generic {
   @PrimaryGeneratedColumn()
-  id: number;
+  Id: number;
 
   @Column({ length: 255 })
-  addressLine1: string;
+  AddressLine1: string;
 
   @Column({ length: 255, nullable: true })
-  addressLine2: string;
+  AddressLine2: string;
 
   @Column({ nullable: true })
-  countryId: number;
+  CountryId: number;
 
   @Column({ nullable: true })
-  stateId: number;
+  StateId: number;
 
   @Column({ nullable: true })
-  cityId: number;
+  CityId: number;
 
   @Column({ length: 12, nullable: true })
-  postalCode: string;
+  PostalCode: string;
 
   @Column({ nullable: true })
-  locationLink: string;
+  LocationLink: string;
 
-  @ManyToOne(() => City)
-  city: City;
-
-  @ManyToOne(() => Country)
-  country: Country;
-
-  @ManyToOne(() => State)
-  state: State;
 }

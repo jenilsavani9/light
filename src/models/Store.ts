@@ -7,26 +7,17 @@ import { Generic } from './Generic';
 @Entity({ name: "Stores" })
 export class Store extends Generic {
   @PrimaryGeneratedColumn()
-  id: number;
+  Id: number;
 
   @Column()
-  userId: number;
+  UserId: number;
 
   @Column({ length: 50 })
-  name: string;
+  Name: string;
 
   @Column({ nullable: true })
-  addressId: number;
+  AddressId: number;
 
   @Column()
-  isActive: boolean;
-
-  @ManyToOne(() => User)
-  user: User;
-
-  @ManyToOne(() => Address)
-  address: Address;
-
-  @OneToMany(() => StoreFeature, storeFeature => storeFeature.store)
-  storeFeatures: StoreFeature[];
+  IsActive: boolean;
 }

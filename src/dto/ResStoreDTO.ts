@@ -1,8 +1,10 @@
 export class ResponseStoreDTO {
-  Id: number;
-  UserId: number;
-  Name: string;
-  Description: string;
-  Address: any;
-  Features: any;
+  id: number;
+  userId: number;
+  name: string;
+  address: any;
+  features: any;
+  city: any;
+  country: any;
+  state: any;
 }

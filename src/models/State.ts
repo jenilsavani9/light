@@ -4,14 +4,12 @@ import { Country } from './Country';
 @Entity({ name: "States" })
 export class State {
   @PrimaryGeneratedColumn()
-  id: number;
+  Id: number;
 
   @Column()
-  countryId: number;
+  CountryId: number;
 
   @Column({ length: 100 })
-  name: string;
+  Name: string;
 
-  @ManyToOne(() => Country)
-  country: Country;
 }
