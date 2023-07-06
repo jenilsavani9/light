@@ -16,6 +16,6 @@ export class Token extends Generic {
   @Column()
   IsActive: boolean;
 
-  @ManyToOne(() => User)
-  user: User;
+  // @ManyToOne(() => User)
+  // user: User;
 }

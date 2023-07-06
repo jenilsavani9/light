@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from "express";
 var jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 import { v4 as uuidv4 } from "uuid";
-var nodemailer = require('nodemailer');
+var nodemailer = require("nodemailer");
 
 import { NotFoundError } from "../utils/error.handler";
 import { SuccessResponse } from "../utils/successResponse.handler";
@@ -13,6 +13,7 @@ import environmentConfig from "../constants/environment.constant";
 import { ResponseUserDTO } from "../dto/ResUserDTO";
 import { Status, Roles } from "../models/User";
 import { AddUserDTO } from "../dto/AddUserDTO";
+import { Not } from "typeorm";
 
 export class UserService {
   public static userRepository = AppDataSource.getRepository(User);
@@ -72,7 +73,7 @@ export class UserService {
           let data = {
             time: Date(),
             userId: user.Id,
-            role: user.Role,
+            role: Roles[user.Role],
           };
 
           const token = jwt.sign(data, jwtSecretKey);
@@ -142,65 +143,279 @@ export class UserService {
   }
 
   public static async SendMail(user: AddUserDTO, emailType: string) {
-    const token = uuidv4();
-    const TempUser = await this.userRepository.findOne({
-      where: {
-        Email: user.Email,
-      },
-    });
+    try {
+      const token = uuidv4();
+      const TempUser = await this.userRepository.findOne({
+        where: {
+          Email: user.Email,
+        },
+      });
 
-    if (TempUser == null) {
-      return false;
+      if (TempUser == null) {
+        return false;
+      }
+
+      const currentDate: Date = new Date();
+
+      const tempToken = this.tokenRepository.create({
+        UserId: TempUser.Id,
+        Value: token,
+        IsActive: true,
+        CreatedAt: currentDate,
+      });
+      await this.tokenRepository.save(tempToken);
+
+      var transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: "jenilsavani8@gmail.com",
+          pass: "bwgnmdxyggqrylsu",
+        },
+      });
+
+      var resetLink =
+        "http://localhost:3000/verify?UserId=" +
+        TempUser.Id +
+        "&token=" +
+        token;
+
+      var body =
+        "Please click on the following link to Validate Mail ID:" +
+        `<a href='${resetLink}'>${resetLink}</a>` +
+        `Email: ${user.Email}<br/>Password : ${user.Password}` +
+        "Please, Use Below Credentionals to login into your account." +
+        "Thank You!!!";
+
+      if (emailType == "Forgot") {
+        body =
+          "Please click on the following link to Validate Mail ID:" +
+          `<a href='${resetLink}'>${resetLink}</a>` +
+          `Email: ${user.Email}<br/>` +
+          "Please, Use Below Credentionals to login into your account." +
+          "Thank You!!!";
+      }
+
+      var mailOptions = {
+        from: "jenilsavani8@gmail.com",
+        to: user.Email,
+        subject: "LightSpeed Password Verify",
+        text: body,
+      };
+
+      await transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          return true;
+        } else {
+          return false;
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      return error;
     }
-
-    await this.tokenRepository.insert({
-      UserId: TempUser.Id,
-      Value: token,
-      IsActive: true,
-      createdAt: Date.now(),
-    });
-
-    var transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: 'jenilsavani8@gmail.com',
-        pass: 'bwgnmdxyggqrylsu'
-      }
-    });
-
-    var mailOptions = {
-      from: 'jenilsavani8@gmail.com',
-      to: user.Email,
-      subject: 'Sending Email using Node.js',
-      text: 'That was easy!'
-    };
-    
-    transporter.sendMail(mailOptions, function(error, info){
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Email sent: ' + info.response);
-      }
-    });
-
-    return true;
   }
 
   public static async ForgotPassword(userId: number) {
-    var tempUser = await this.userRepository.findOne({
-      where: {
-        Id: userId,
-      },
-    });
+    try {
+      var tempUser = await this.userRepository.findOne({
+        where: {
+          Id: userId,
+        },
+      });
 
-    let user: AddUserDTO;
-    user.Email = tempUser.Email;
-    user.FirstName = tempUser.FirstName;
-    user.LastName = tempUser.LastName;
-    user.Password = tempUser.Password;
+      var user = new AddUserDTO();
+      user.Email = tempUser.Email;
+      user.FirstName = tempUser.FirstName;
+      user.LastName = tempUser.LastName;
+      user.Password = tempUser.Password;
 
-    let status = await this.SendMail(user, "Forgot")
+      let status = await this.SendMail(user, "Forgot");
 
-    return true;
+      return true;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  public static async ResetPassword(req) {
+    try {
+      let email = req.body.email;
+      let password = req.body.password;
+      let newPassword = req.body.newPassword;
+      var tempUser = await this.userRepository.findOne({
+        where: {
+          Email: email,
+        },
+      });
+
+      if (tempUser != null) {
+        bcrypt.compare(
+          password,
+          tempUser.Password,
+          async function (err, result) {
+            if (err) {
+              return false;
+            } else if (result == true) {
+              tempUser.Password = await bcrypt.hashSync(newPassword, 10);
+            } else {
+              return false;
+            }
+          }
+        );
+      }
+      await this.userRepository.save(tempUser);
+      return true;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  public static async ChangePassword(req: Request) {
+    try {
+      let UserId = req.body.userId;
+      let Password = req.body.password;
+
+      var tempUser = await this.userRepository.findOne({
+        where: {
+          Id: UserId,
+        },
+      });
+
+      tempUser.Password = bcrypt.hashSync(Password, 10);
+      await this.userRepository.save(tempUser);
+
+      const resUser: ResponseUserDTO = {
+        id: tempUser.Id,
+        firstName: tempUser.FirstName,
+        lastName: tempUser.LastName,
+        email: tempUser.Email,
+        status: Status[tempUser.Status],
+        role: Roles[tempUser.Role],
+        lastLogin: tempUser.LastLogin,
+      };
+
+      return resUser;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  public static async AddUser(req) {
+    try {
+      const reqUser: AddUserDTO = {
+        FirstName: req.body.firstName,
+        LastName: req.body.lastName,
+        Email: req.body.email,
+        Password: req.body.password,
+      };
+
+      var tempUser = await this.userRepository.findOne({
+        where: {
+          Email: reqUser.Email,
+        },
+      });
+
+      var currentDate = new Date();
+      if (tempUser == null) {
+        const User = this.userRepository.create({
+          FirstName: reqUser.FirstName,
+          LastName: reqUser.LastName,
+          Email: reqUser.Email,
+          Password: bcrypt.hashSync(reqUser.Password, 10),
+          Status: Status.pending,
+          Role: Roles.customer,
+          CreatedAt: currentDate,
+        });
+        await this.userRepository.save(User);
+
+        await this.SendMail(reqUser, "Reset");
+
+        const resUser: ResponseUserDTO = {
+          id: User.Id,
+          firstName: User.FirstName,
+          lastName: User.LastName,
+          email: User.Email,
+          status: Status[User.Status],
+          role: Roles[User.Role],
+          lastLogin: User.LastLogin,
+        };
+        return resUser;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  public static async GetUserCount() {
+    return this.userRepository.countBy({ Status: Not(Status.deactive) });
+  }
+
+  public static async GetUserList(req: Request) {
+    try {
+      var pageUser = 9;
+      var pageindex = req.query.pageIndex;
+      var userList = await this.userRepository.find({
+        where: [
+          {
+            Status: Status.active,
+          },
+          {
+            Status: Status.pending
+          }
+        ],
+        skip: pageUser * pageindex,
+        take: pageUser,
+      });
+
+      var resUserList = [];
+      userList.forEach((element) => {
+        const resUser: ResponseUserDTO = {
+          id: element.Id,
+          firstName: element.FirstName,
+          lastName: element.LastName,
+          email: element.Email,
+          status: Status[element.Status],
+          role: Roles[element.Role],
+          lastLogin: element.LastLogin,
+        };
+        resUserList.push(resUser);
+      });
+
+      return resUserList;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  public static async DeleteUser(req: Request) {
+    try {
+      var userid = req.query.userId;
+
+      var user = await this.userRepository.findOne({
+        where: {
+          Id: userid,
+        },
+      });
+
+      if (user == null) {
+        return null;
+      }
+      if (user.Status == Status.deactive) {
+        return null!;
+      }
+      user.Status = Status.deactive;
+      user.UpdatedAt = new Date();
+      await this.userRepository.save(user);
+
+      return user;
+    } catch (error) {
+      return error;
+    }
   }
 }

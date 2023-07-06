@@ -26,15 +26,15 @@ export class UserRepository {
 
   public static async ResetPassword(req: Request, res: Response) {
     try {
-      let result = await UserService.ForgotPassword(req.body.UserId);
+      let result = await UserService.ResetPassword(req);
       if (result == true) {
         res
           .status(200)
-          .json(new SuccessResponse(true, "", 200, "Password Reset"));
+          .json(new SuccessResponse(true, "", 200, "Request Success"));
       } else {
         res
           .status(400)
-          .json(new SuccessResponse(true, "", 400, "Password Reset"));
+          .json(new SuccessResponse(true, "", 400, "Some Error Occurred"));
       }
     } catch (err) {
       return err;
@@ -47,11 +47,11 @@ export class UserRepository {
       if (result == true) {
         res
           .status(200)
-          .json(new SuccessResponse(true, "", 200, "Password Reset"));
+          .json(new SuccessResponse(true, "", 200, "Request Success"));
       } else {
         res
           .status(400)
-          .json(new SuccessResponse(true, "", 400, "Password Reset"));
+          .json(new SuccessResponse(true, "", 400, "Some Error Occurred"));
       }
     } catch (err) {
       return err;
@@ -60,7 +60,16 @@ export class UserRepository {
 
   public static async ChangePassword(req: Request, res: Response) {
     try {
-      return res.status(200).json("ChangePassword");
+      let result = await UserService.ChangePassword(req);
+      if (result != null) {
+        res
+          .status(200)
+          .json(new SuccessResponse(true, "", 200, "Request Success"));
+      } else {
+        res
+          .status(400)
+          .json(new SuccessResponse(true, "", 400, "Some Error Occurred"));
+      }
     } catch (err) {
       return err;
     }
@@ -68,7 +77,14 @@ export class UserRepository {
 
   public static async AddUser(req: Request, res: Response) {
     try {
-      return res.status(200).json("AddUser");
+      var TempUser = await UserService.AddUser(req);
+      if (TempUser != null) {
+        res.status(200).json(new SuccessResponse(true, "", 200, TempUser));
+      } else {
+        res
+          .status(400)
+          .json(new SuccessResponse(true, "", 400, "Some Error Occurred"));
+      }
     } catch (err) {
       return err;
     }
@@ -76,7 +92,15 @@ export class UserRepository {
 
   public static async GetUserList(req: Request, res: Response) {
     try {
-      return res.status(200).json("GetUserList");
+      var userList = await UserService.GetUserList(req);
+      var userCount = await UserService.GetUserCount();
+      if (userList != null) {
+        res.status(200).json(new SuccessResponse(true, "", 200, { userList, userCount }));
+      } else {
+        res
+          .status(401)
+          .json(new SuccessResponse(true, "", 401, "Some Error Occurred"));
+      }
     } catch (err) {
       return err;
     }
@@ -84,7 +108,14 @@ export class UserRepository {
 
   public static async DeleteUser(req: Request, res: Response) {
     try {
-      return res.status(200).json("DeleteUser");
+      var result = await UserService.DeleteUser(req);
+      if (result != null) {
+        res.status(200).json(new SuccessResponse(true, "", 200, { result }));
+      } else {
+        res
+          .status(401)
+          .json(new SuccessResponse(true, "", 401, "Some Error Occurred"));
+      }
     } catch (err) {
       return err;
     }

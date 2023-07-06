@@ -1,9 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { CreateDateColumn, UpdateDateColumn } from "typeorm";
 
 export class Generic {
-  @Column({ default: () => "CURRENT_TIMESTAMP" })
-  createdAt: Date;
+  @CreateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
+  CreatedAt!: Date;
 
-  @Column({ type: "timestamp", nullable: true })
-  updatedAt: Date;
+  @UpdateDateColumn({ type: "datetime", nullable: true })
+  UpdatedAt?: Date;
 }
