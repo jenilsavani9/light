@@ -48,7 +48,7 @@ export class FeatureService {
       var name = req.body.name;
       var description = req.body.description;
 
-      const tempFeature = await this.featureRepository.create({
+      const tempFeature = this.featureRepository.create({
         UserId: userId,
         Name: name,
         Description: description,
@@ -136,7 +136,7 @@ export class FeatureService {
         .execute();
 
       for (const featureId of featureIds) {
-        var newStoreFeature = await this.storeFeatureRepository.create({
+        var newStoreFeature = this.storeFeatureRepository.create({
           FeatureId: featureId,
           StoreId: storeId,
           Status: true,

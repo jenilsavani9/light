@@ -2,7 +2,6 @@ import express, { Express, Request, Response, Application } from "express";
 import * as dotenv from "dotenv";
 import { errors } from "celebrate";
 import helmet from 'helmet';
-import morgan from 'morgan';
 
 import { AppDataSource } from "./dbConfig";
 import environmentConfig from "./constants/environment.constant";
@@ -15,7 +14,6 @@ export class App {
   constructor() {
     this.app.use(helmet());
     this.app.use(express.json());
-    this.app.use(morgan('tiny'));
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use((request, response, next) => {
       response.header("Access-Control-Allow-Origin", "*");
