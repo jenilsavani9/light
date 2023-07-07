@@ -98,7 +98,16 @@ export class FeatureRepository {
 
   public static async AddStoreFeatures(req: Request, res: Response) {
     try {
-      return res.status(200).json("AddStoreFeatures");
+      var result = await FeatureService.AddStoreFeatures(req);
+      if (result != null) {
+        res
+          .status(200)
+          .json(new SuccessResponse(true, "Request Success", 200, result));
+      } else {
+        res
+          .status(400)
+          .json(new SuccessResponse(true, "", 400, "Some Error Occurred"));
+      }
     } catch (err) {
       return err;
     }

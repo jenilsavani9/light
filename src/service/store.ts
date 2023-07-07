@@ -42,10 +42,29 @@ export class StoreService {
     return ResponseAddressDTO;
   }
 
-  public static MapperResponseLocationDTO(loc: City | State | Country) {
+  public static MapperResponseCityDTO(loc: City) {
     var ResponseLocationDTO = {
       id: loc.Id,
       name: loc.Name,
+      stateId: loc.StateId,
+      countryId: loc.CountryId
+    };
+    return ResponseLocationDTO;
+  }
+
+  public static MapperResponseCountryDTO(loc: Country) {
+    var ResponseLocationDTO = {
+      id: loc.Id,
+      name: loc.Name,
+    };
+    return ResponseLocationDTO;
+  }
+
+  public static MapperResponseStateDTO(loc: State) {
+    var ResponseLocationDTO = {
+      id: loc.Id,
+      name: loc.Name,
+      countryId: loc.CountryId
     };
     return ResponseLocationDTO;
   }
@@ -102,9 +121,9 @@ export class StoreService {
       });
 
       var ResAddressDTO = this.MapperResponseAddressDTO(tempAddress);
-      var ResCityDTO = this.MapperResponseLocationDTO(tempCity);
-      var ResStateDTO = this.MapperResponseLocationDTO(tempState);
-      var ResCountryDTO = this.MapperResponseLocationDTO(tempCountry);
+      var ResCityDTO = this.MapperResponseCityDTO(tempCity);
+      var ResStateDTO = this.MapperResponseStateDTO(tempState);
+      var ResCountryDTO = this.MapperResponseCountryDTO(tempCountry);
 
       var tempStoreFeatures = await this.storeFeatureRepository.find({
         where: {
@@ -141,15 +160,15 @@ export class StoreService {
 
   public static async AddStore(req: Request) {
     try {
-      var userId = req.body.userId;
-      var name = req.body.name;
-      var addressLine1 = req.body.addressLine1;
-      var addressLine2 = req.body.addressLine2;
-      var countryId = req.body.countryId;
-      var stateId = req.body.stateId;
-      var cityId = req.body.cityId;
-      var postalCode = req.body.postalCode;
-      var locationLink = req.body.locationLink;
+      var userId = req.body.UserId;
+      var name = req.body.Name;
+      var addressLine1 = req.body.AddressLine1;
+      var addressLine2 = req.body.AddressLine2;
+      var countryId = req.body.CountryId;
+      var stateId = req.body.StateId;
+      var cityId = req.body.CityId;
+      var postalCode = req.body.PostalCode;
+      var locationLink = req.body.LocationLink;
 
       var newAddress = await this.addressRepository.create({
         AddressLine1: addressLine1,
@@ -181,11 +200,11 @@ export class StoreService {
   public static async EditStore(req: Request) {
     try {
       var id = req.params.id;
-      var name = req.body.name;
-      var addressLine1 = req.body.addressLine1;
-      var addressLine2 = req.body.addressLine2;
-      var postalCode = req.body.postalCode;
-      var locationLink = req.body.locationLink;
+      var name = req.body.Name;
+      var addressLine1 = req.body.AddressLine1;
+      var addressLine2 = req.body.AddressLine2;
+      var postalCode = req.body.PostalCode;
+      var locationLink = req.body.LocationLink;
 
       var store = await this.storeRepository.findOne({
         where: {
@@ -238,5 +257,29 @@ export class StoreService {
     var countries = await this.countryRepository.find();
 
     return { cities, states, countries };
+  }
+
+  public static async GetCountry() {
+    var countries = await this.countryRepository.find();
+
+    return { countries };
+  }
+
+  public static async GetState(countryId: number) {
+    var states = await this.stateRepository.find({
+      where: {
+        CountryId: countryId
+      }
+    })
+    return { states };
+  }
+
+  public static async GetCity(stateId: number) {
+    var cities = await this.cityRepository.find({
+      where: {
+        StateId: stateId
+      }
+    })
+    return { cities };
   }
 }

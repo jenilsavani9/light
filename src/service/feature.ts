@@ -3,9 +3,12 @@ import { Router, Request, Response, NextFunction } from "express";
 import { AppDataSource } from "../dbConfig";
 import { Feature } from "../models/Feature";
 import { ResponseFeatureDTO } from "../dto/ResFeatureDTO";
+import { StoreFeature } from "../models/StoreFeature";
 
 export class FeatureService {
   public static featureRepository = AppDataSource.getRepository(Feature);
+  public static storeFeatureRepository =
+    AppDataSource.getRepository(StoreFeature);
 
   public static MapperResponseFeatureDTO(feature: Feature) {
     var ResponseFeatureDTO: ResponseFeatureDTO = {
@@ -116,6 +119,48 @@ export class FeatureService {
       this.featureRepository.save(tempFeature);
 
       return this.MapperResponseFeatureDTO(tempFeature);
+    } catch (error) {
+      return error;
+    }
+  }
+
+  public static async AddStoreFeatures(req: Request) {
+    try {
+      var storeId = req.body.StoreId;
+      var featureIds = req.body.featureIds;
+      await this.storeFeatureRepository
+        .createQueryBuilder("StoreFeatures")
+        .delete()
+        .from(StoreFeature)
+        .where("StoreId = :id", { id: storeId })
+        .execute();
+
+      for (const featureId of featureIds) {
+        var newStoreFeature = await this.storeFeatureRepository.create({
+          FeatureId: featureId,
+          StoreId: storeId,
+          Status: true,
+        });
+        await this.storeFeatureRepository.save(newStoreFeature);
+      }
+
+      var newStoreFeatures = await this.storeFeatureRepository.find({
+        where: {
+          StoreId: storeId,
+          Status: true,
+        },
+      });
+
+      var resList = [];
+      for (const feature of newStoreFeatures) {
+        var oneFeature = await this.featureRepository.findOne({
+          where: {
+            Id: feature.FeatureId,
+          },
+        });
+        resList.push(this.MapperResponseFeatureDTO(oneFeature));
+      }
+      return resList;
     } catch (error) {
       return error;
     }

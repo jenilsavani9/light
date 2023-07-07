@@ -99,6 +99,18 @@ export class UserService {
     }
   }
 
+  public static isEntryCreated24HoursAgo(createdDate: Date): boolean {
+    const twentyFourHours = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    const currentDate = new Date();
+    const timeDifference = currentDate.getTime() - createdDate.getTime();
+
+    if (timeDifference >= twentyFourHours) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   public static async ValidateEmail(req: Request, res: Response) {
     try {
       const queryUserId = req.query.UserId;
@@ -115,11 +127,15 @@ export class UserService {
           .status(200)
           .json(new SuccessResponse(true, "Not Found", 404));
       }
-      // if (Entry.createdAt. <= DateTime.Now) {
-      //   return res
-      //   .status(200)
-      //   .json(new SuccessResponse(true, "Not Found", 404));
-      // }
+
+      const entryCreatedDate = new Date(Entry.CreatedAt);
+      if (this.isEntryCreated24HoursAgo(entryCreatedDate) == true) {
+        Entry.IsActive = false;
+        await this.tokenRepository.save(Entry);
+        return res
+          .status(404)
+          .json(new SuccessResponse(true, "Token Expired!!!", 404));
+      }
       var user = await this.userRepository.findOne({
         where: {
           Id: queryUserId,
@@ -145,7 +161,16 @@ export class UserService {
         lastLogin: user.LastLogin,
       };
 
-      return res.status(200).json(new SuccessResponse(true, "Email Verified Successfully!", 200, resUser));
+      return res
+        .status(200)
+        .json(
+          new SuccessResponse(
+            true,
+            "Email Verified Successfully!",
+            200,
+            resUser
+          )
+        );
     } catch (error) {
       console.log(error);
       return error;
@@ -376,8 +401,8 @@ export class UserService {
             Status: Status.active,
           },
           {
-            Status: Status.pending
-          }
+            Status: Status.pending,
+          },
         ],
         skip: pageUser * pageindex,
         take: pageUser,
