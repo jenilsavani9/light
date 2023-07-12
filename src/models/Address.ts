@@ -1,8 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { City } from './City';
-import { Country } from './Country';
-import { State } from './State';
-import { Generic } from './Generic';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { Generic } from "./Generic";
 
 @Entity({ name: "Addresses" })
 export class Address extends Generic {
@@ -29,5 +26,4 @@ export class Address extends Generic {
 
   @Column({ nullable: true })
   LocationLink: string;
-
 }

@@ -1,6 +1,4 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { Feature } from './Feature';
-import { Store } from './Store';
 
 @Entity({ name: "StoreFeatures" })
 export class StoreFeature {
