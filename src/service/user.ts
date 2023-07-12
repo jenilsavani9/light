@@ -1,6 +1,6 @@
-import { Router, Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 var jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 var nodemailer = require("nodemailer");
 
@@ -32,7 +32,7 @@ export class UserService {
     }
   }
 
-  public static async GetUserById(id) {
+  public static async GetUserById(id: any) {
     try {
       const user = await this.userRepository.findOne({
         where: {

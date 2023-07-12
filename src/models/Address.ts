@@ -29,5 +29,4 @@ export class Address extends Generic {
 
   @Column({ nullable: true })
   LocationLink: string;
-  // hello
 }

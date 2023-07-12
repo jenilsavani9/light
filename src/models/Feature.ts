@@ -1,5 +1,4 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { User } from './User';
 import { Generic } from './Generic';
 
 @Entity({ name: "Features" })

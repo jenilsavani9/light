@@ -1,7 +1,4 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
-import { User } from './User';
-import { Address } from './Address';
-import { StoreFeature } from './StoreFeature';
 import { Generic } from './Generic';
 
 @Entity({ name: "Stores" })

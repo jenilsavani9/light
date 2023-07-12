@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
 import { FeatureRepository } from '../repositories/feature';
 import { verifyUser } from '../middleware/authMiddleware';
 

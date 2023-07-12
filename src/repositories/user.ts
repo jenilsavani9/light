@@ -1,4 +1,4 @@
-import { Router, Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { UserService } from "../service/user";
 import { SuccessResponse } from "../utils/successResponse.handler";
 
