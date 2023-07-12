@@ -6,7 +6,6 @@ export class UserRepository {
   public static async userLogin(
     req: Request,
     res: Response,
-    next: NextFunction
   ) {
     try {
       return UserService.GenerateToken(req, res);

@@ -47,7 +47,7 @@ export class UserService {
 
   public static async GenerateToken(req: Request, res: Response) {
     try {
-      const email = req.body.email;
+      const email = req.body.emailId;
       const password = req.body.password;
       const user = await this.userRepository.findOne({
         where: {
@@ -299,6 +299,7 @@ export class UserService {
           }
         );
       }
+
       await this.userRepository.save(tempUser);
       return true;
     } catch (error) {
@@ -309,8 +310,8 @@ export class UserService {
 
   public static async ChangePassword(req: Request) {
     try {
-      let UserId = req.body.userId;
-      let Password = req.body.password;
+      let UserId = req.body.UserId;
+      let Password = req.body.Password;
 
       var tempUser = await this.userRepository.findOne({
         where: {

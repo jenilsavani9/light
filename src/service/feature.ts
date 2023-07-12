@@ -118,6 +118,15 @@ export class FeatureService {
 
       this.featureRepository.save(tempFeature);
 
+      const storeFeatureList = await this.storeFeatureRepository.find({
+        where: {
+          FeatureId: Id,
+        },
+      });
+      for (var deleteStoreFeature of storeFeatureList) {
+        this.storeFeatureRepository.remove(deleteStoreFeature);
+      }
+
       return this.MapperResponseFeatureDTO(tempFeature);
     } catch (error) {
       return error;

@@ -71,7 +71,7 @@ export class StoreService {
 
   public static async GetStoresByUserId(req: Request) {
     try {
-      var userId = req.query.userId;
+      var userId = req.query.UserId;
       var tempStoreList = await this.storeRepository.find({
         where: {
           UserId: userId,
@@ -128,6 +128,7 @@ export class StoreService {
       var tempStoreFeatures = await this.storeFeatureRepository.find({
         where: {
           StoreId: element.Id,
+          Status: true
         },
       });
 
