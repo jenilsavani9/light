@@ -16,12 +16,16 @@ export const verifyUser = async (
 ) => {
   const { authorization } = req.headers as any;
   if (!authorization) {
-    throw new AuthFailureError("401", "Invalid Token..!");
+    return res
+          .status(401)
+          .json({ message: "Invalid Token!", status: 400 });
   }
 
   const scheme = authorization.split(" ")[0];
   if (scheme !== "Bearer") {
-    throw new AuthFailureError("401", "Invalid Token..!");
+    return res
+          .status(401)
+          .json({ message: "Invalid Token!", status: 400 });
   }
   const token = authorization.split(" ")[1];
   jwt.verify(
@@ -29,7 +33,9 @@ export const verifyUser = async (
     environmentConfig.JWT_SECRET_KEY,
     async (err: any, payload: any) => {
       if (err) {
-        throw new AuthFailureError("401", "Inavalid username or password..!");
+        return res
+          .status(401)
+          .json({ message: "User Credential failed!!!", status: 401 });
       }
       const { userId } = payload;
       const user = await UserService.GetUserById(userId);

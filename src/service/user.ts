@@ -23,7 +23,7 @@ export class UserService {
     try {
       const users = await this.userRepository.find();
       if (!users) {
-        throw new NotFoundError("404", "Not Found");
+        return res.status(404).json({ message: "Not Found", status: 404 });
       } else {
         return res.status(200).json(new SuccessResponse(true, "", 200, users));
       }
@@ -49,6 +49,7 @@ export class UserService {
     try {
       const email = req.body.emailId;
       const password = req.body.password;
+      const lastLogin = req.body.lastLogin;
       const user = await this.userRepository.findOne({
         where: {
           Email: email,
@@ -59,7 +60,7 @@ export class UserService {
           .status(401)
           .json(new SuccessResponse(true, "Not Found", 401));
       }
-      bcrypt.compare(password, user.Password, function (err, result) {
+      bcrypt.compare(password, user.Password, async function (err, result) {
         if (err) {
           return res
             .status(401)
@@ -69,6 +70,11 @@ export class UserService {
             .status(401)
             .json(new SuccessResponse(true, "Credential Mismatched!!!", 401));
         } else {
+          // if (lastLogin != "" && lastLogin != null) {
+          //   user.LastLogin = lastLogin;
+          //   console.log(user);
+          //   await this.userRepository.save(user);
+          // }
           let jwtSecretKey = environmentConfig.JWT_SECRET_KEY;
           let data = {
             time: Date(),
@@ -76,7 +82,7 @@ export class UserService {
             role: Roles[user.Role],
           };
 
-          const token = jwt.sign(data, jwtSecretKey);
+          const token = jwt.sign(data, jwtSecretKey, { expiresIn: "1d" });
 
           const resUser: ResponseUserDTO = {
             id: user.Id,
@@ -93,7 +99,6 @@ export class UserService {
             .json(new SuccessResponse(true, "", 200, { token, user: resUser }));
         }
       });
-      throw new NotFoundError("404", "Not Found");
     } catch (error: any) {
       return error;
     }
@@ -141,16 +146,6 @@ export class UserService {
           Id: queryUserId,
         },
       });
-      if (user == null) {
-        return res
-          .status(200)
-          .json(new SuccessResponse(true, "Not Found", 404));
-      }
-      Entry.IsActive = false;
-      user.Status = Status.active;
-      await this.tokenRepository.save(Entry);
-      await this.userRepository.save(user);
-
       const resUser: ResponseUserDTO = {
         id: user.Id,
         firstName: user.FirstName,
@@ -160,6 +155,16 @@ export class UserService {
         role: Roles[user.Role],
         lastLogin: user.LastLogin,
       };
+
+      if (user == null) {
+        return res
+          .status(404)
+          .json(new SuccessResponse(true, "Not Found", 404));
+      }
+      Entry.IsActive = false;
+      user.Status = Status.active;
+      await this.tokenRepository.save(Entry);
+      await this.userRepository.save(user);
 
       return res
         .status(200)

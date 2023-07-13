@@ -42,7 +42,7 @@ export class UserRepository {
 
   public static async ForgotPassword(req: Request, res: Response) {
     try {
-      let result = await UserService.ForgotPassword(req.body.UserId);
+      let result = await UserService.ForgotPassword(req.query.UserId);
       if (result == true) {
         res
           .status(200)
