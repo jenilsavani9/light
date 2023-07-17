@@ -1,0 +1,26 @@
+service: Light
+frameworkVersion: "3"
+plugins:
+  - serverless-offline
+provider:
+  name: aws
+  runtime: nodejs18.x
+custom:
+  serverless-offline:
+    httpPort: 44352
+functions:
+  Todos:
+    handler: dist/app.handler
+    events:
+      - httpApi:
+          path: /
+          method: GET
+      - httpApi:
+          path: /
+          method: POST
+      - httpApi:
+          path: /{id}
+          method: PUT
+      - httpApi:
+          path: /{id}
+          method: DELETE
